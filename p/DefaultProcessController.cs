@@ -1,4 +1,5 @@
-﻿using System;
+﻿using p.Log;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -12,13 +13,18 @@ namespace p
 		[DllImport("USER32.DLL")]
 		private static extern bool SetForegroundWindow(IntPtr hWnd);
 
+		public DefaultProcessController(ILog log)
+		{
+			Log = log ?? throw new ArgumentNullException(nameof(log));
+		}
+
 		public Process[] GetByName(string processName)
 		{
 			var processes = Process.GetProcessesByName(processName);
 
 			if (processes?.Length == 0)
 			{
-				Console.WriteLine("No processes found.");
+				Log.Log("No processes found.");
 			}
 			else
 			{
@@ -26,9 +32,9 @@ namespace p
 					processes = new Process[] { processes[0] };
 
 				if (processes.Length == 1)
-					Console.WriteLine($"Found process " + processes[0].Id.ToString());
+					Log.Log($"Found process " + processes[0].Id.ToString());
 				else
-					Console.WriteLine($"Found {processes.Length} processes: " + string.Join(", ", processes.Select(p => p.Id.ToString()).ToArray()));
+					Log.Log($"Found {processes.Length} processes: " + string.Join(", ", processes.Select(p => p.Id.ToString()).ToArray()));
 			}
 
 			return processes;
@@ -46,6 +52,7 @@ namespace p
 		}
 
 		public Target TargetMode { get; set; } = Target.AllProcesses;
+		public ILog Log { get; }
 
 		public enum Target
 		{

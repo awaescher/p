@@ -1,4 +1,5 @@
 ﻿using p.Commands;
+using p.Log;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,10 @@ namespace p
 				typeof(KillCommand)
 			};
 			container.RegisterMultiple<Command>(commandTypes).AsSingleton();
-			container.Register<IProcessController>(new DefaultProcessController() { TargetMode = targetMode });
+			container.Register<ILog, ConsoleLog>().AsSingleton();
+			container.Register<IProcessController>(
+				new DefaultProcessController(container.Resolve<ILog>()) { TargetMode = targetMode }
+				);
 
 			var commands = container.ResolveAll<Command>();
 			var command = commands.FirstOrDefault(c => c.Prefix == argument[0]);
