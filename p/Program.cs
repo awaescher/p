@@ -32,6 +32,7 @@ namespace p
 				: DefaultProcessController.Target.FirstProcess;
 
 			var processName = argument.Substring(multiProcessMode ? 2 : 1);
+			var processArgs = args.Length > 1 ? args.Skip(1).ToArray() : new string[0];
 
 			var commandTypes = new Type[] {
 				typeof(NewCommand),
@@ -41,6 +42,7 @@ namespace p
 			};
 			container.RegisterMultiple<Command>(commandTypes).AsSingleton();
 			container.Register<ILog, ConsoleLog>().AsSingleton();
+			container.Register(new ArgumentProvider(processArgs));
 			container.Register<IProcessController>(
 				new DefaultProcessController(container.Resolve<ILog>()) { TargetMode = targetMode }
 				);

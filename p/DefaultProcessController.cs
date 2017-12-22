@@ -40,9 +40,14 @@ namespace p
 			return processes;
 		}
 
-		public void Start(string processName)
+		public bool Start(string processName, string arguments = null)
 		{
 			Process.Start(processName);
+			var psi = new ProcessStartInfo();
+			psi.Arguments = arguments;
+			psi.FileName = processName;
+
+			return Process.Start(psi).Id != 0;
 		}
 
 		public void BringToFront(Process process)

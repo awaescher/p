@@ -8,6 +8,6 @@ namespace p
 
 		Process[] GetByName(string processName);
 
-		void Start(string processName);
+		bool Start(string processName, string arguments = null);
 	}
 }

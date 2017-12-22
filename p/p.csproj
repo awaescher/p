@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgumentProvider.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\KillCommand.cs" />
     <Compile Include="Commands\FocusCommand.cs" />
