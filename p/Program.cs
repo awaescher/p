@@ -2,7 +2,9 @@
 using p.Log;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace p
@@ -34,6 +36,9 @@ namespace p
 			var processName = argument.Substring(multiProcessMode ? 2 : 1);
 			var processArgs = args.Length > 1 ? args.Skip(1).ToArray() : new string[0];
 
+			var aliasMapFile = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, "alias.map");
+			var aliasMapLines = File.Exists(aliasMapFile) ? File.ReadAllLines(aliasMapFile) : new string[0];
+
 			var commandTypes = new Type[] {
 				typeof(NewCommand),
 				typeof(FocusCommand),
@@ -43,9 +48,9 @@ namespace p
 			container.RegisterMultiple<Command>(commandTypes).AsSingleton();
 			container.Register<ILog, ConsoleLog>().AsSingleton();
 			container.Register(new ArgumentProvider(processArgs));
-			container.Register<IProcessController>(
-				new DefaultProcessController(container.Resolve<ILog>()) { TargetMode = targetMode }
-				);
+			container.Register(AliasMap.Read(aliasMapLines));
+			container.Register<IProcessController, DefaultProcessController>().AsSingleton();
+			(container.Resolve<IProcessController>() as DefaultProcessController).TargetMode = targetMode;
 
 			var commands = container.ResolveAll<Command>();
 			var command = commands.FirstOrDefault(c => c.Prefix == argument[0]);

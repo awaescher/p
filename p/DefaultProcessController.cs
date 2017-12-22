@@ -13,13 +13,16 @@ namespace p
 		[DllImport("USER32.DLL")]
 		private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-		public DefaultProcessController(ILog log)
+		public DefaultProcessController(AliasMap aliasMap, ILog log)
 		{
+			AliasMap = aliasMap ?? throw new ArgumentNullException(nameof(aliasMap));
 			Log = log ?? throw new ArgumentNullException(nameof(log));
 		}
 
 		public Process[] GetByName(string processName)
 		{
+			processName = ResolveProcessName(processName);
+
 			var processes = Process.GetProcessesByName(processName);
 
 			if (processes?.Length == 0)
@@ -42,7 +45,8 @@ namespace p
 
 		public bool Start(string processName, string arguments = null)
 		{
-			Process.Start(processName);
+			processName = ResolveProcessName(processName);
+
 			var psi = new ProcessStartInfo();
 			psi.Arguments = arguments;
 			psi.FileName = processName;
@@ -56,7 +60,15 @@ namespace p
 				SetForegroundWindow(process.MainWindowHandle);
 		}
 
+		public string ResolveProcessName(string value)
+		{
+			return AliasMap.TryResolve(value);
+		}
+
 		public Target TargetMode { get; set; } = Target.AllProcesses;
+
+		public AliasMap AliasMap { get; }
+
 		public ILog Log { get; }
 
 		public enum Target
