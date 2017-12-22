@@ -12,11 +12,6 @@ namespace p
 		[DllImport("USER32.DLL")]
 		private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-		public DefaultProcessController(TargetMode target)
-		{
-			Target = target;
-		}
-
 		public Process[] GetByName(string processName)
 		{
 			var processes = Process.GetProcessesByName(processName);
@@ -27,7 +22,7 @@ namespace p
 			}
 			else
 			{
-				if (Target == TargetMode.FirstProcess)
+				if (TargetMode == Target.FirstProcess)
 					processes = new Process[] { processes[0] };
 
 				if (processes.Length == 1)
@@ -50,9 +45,9 @@ namespace p
 				SetForegroundWindow(process.MainWindowHandle);
 		}
 
-		public TargetMode Target { get; }
+		public Target TargetMode { get; set; } = Target.AllProcesses;
 
-		public enum TargetMode
+		public enum Target
 		{
 			FirstProcess,
 			AllProcesses

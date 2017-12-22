@@ -27,8 +27,8 @@ namespace p
 			var multiProcessMode = argument[0] == argument[1];
 
 			var targetMode = multiProcessMode
-				? DefaultProcessController.TargetMode.AllProcesses
-				: DefaultProcessController.TargetMode.FirstProcess;
+				? DefaultProcessController.Target.AllProcesses
+				: DefaultProcessController.Target.FirstProcess;
 
 			var processName = argument.Substring(multiProcessMode ? 2 : 1);
 
@@ -39,7 +39,7 @@ namespace p
 				typeof(KillCommand)
 			};
 			container.RegisterMultiple<Command>(commandTypes).AsSingleton();
-			container.Register<IProcessController>(new DefaultProcessController(targetMode));
+			container.Register<IProcessController>(new DefaultProcessController() { TargetMode = targetMode });
 
 			var commands = container.ResolveAll<Command>();
 			var command = commands.FirstOrDefault(c => c.Prefix == argument[0]);
