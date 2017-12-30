@@ -51,7 +51,15 @@ namespace p
 			psi.Arguments = arguments;
 			psi.FileName = processName;
 
-			return Process.Start(psi).Id != 0;
+			try
+			{
+				return Process.Start(psi).Id != 0;
+			}
+			catch (Exception ex)
+			{
+				Log.Log($"Could not start \"{processName}\": " + ex.Message);
+				return false;
+			}
 		}
 
 		public void BringToFront(Process process)

@@ -15,10 +15,14 @@ namespace p
 
 			foreach (var line in mapLines)
 			{
-				var parts = line.Split(':');
+				var keyEnd = line.IndexOf(':');
+				if (keyEnd < 0 || keyEnd >= line.Length)
+					continue;
 
-				if (parts.Length == 2)
-					map.Define(parts[0], parts[1]);
+				var key = line.Substring(0, keyEnd);
+				var value = line.Substring(keyEnd + 1);
+
+				map.Define(key, value);
 			}
 
 			return map;
